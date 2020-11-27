@@ -15,7 +15,7 @@ export const connectPeer = () =>
   new Promise((res) => {
     const peer = new Peer(sessionStorage.getItem('userId') || undefined, {
       secure: IS_PROD,
-      host: IS_PROD ? 'app-hey.herokuapp.com' : '/',
+      host: IS_PROD ? 'heycloud.herokuapp.com' : '/',
       port: IS_PROD ? 443 : 4000,
       path: '/api/peer',
       config: {
