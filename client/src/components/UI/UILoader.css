@@ -1,0 +1,31 @@
+.loader-double-bounce {
+  width: 4rem;
+  height: 4rem;
+  position: relative;
+  margin: auto;
+}
+
+.loader-child {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: loader-double-bounce 1s infinite ease-in-out;
+}
+
+.loader-double-bounce-2 {
+  animation-delay: -0.5s;
+}
+
+@keyframes loader-double-bounce {
+  0%,
+  100% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
