@@ -8,6 +8,7 @@ export function* rootSaga() {
   const socket = yield call(connectSocket);
   yield put(userActions.updateUser({ userId: peer.id }));
   yield fork(userSagas.watchCreateStream);
+  yield fork(userSagas.watchUpdateUser, socket);
   yield fork(roomSagas.watchCreateRoom, socket);
   yield fork(roomSagas.watchCheckRoom, socket);
   yield fork(roomSagas.watchJoinRoom, socket);

@@ -5,10 +5,11 @@ import { store } from '../';
 import { userActions, userSelectors, UserState } from '../user';
 import { roomActions, roomSelectors } from './';
 import {
-  CheckRoomAction,
   RoomState,
   RoomTypes,
+  CheckRoomAction,
   UpdateRoomAction,
+  UpdateRoomUserAction,
   UpdateRoomUsersAction,
 } from './types';
 
@@ -19,8 +20,11 @@ function roomChannel(socket: SocketIOClient.Socket, peer: Peer) {
     socket.on('room_update', (room: UpdateRoomAction['payload']) => {
       emit(roomActions.updateRoom(room));
     });
-    socket.on('room_update_users', (user: UpdateRoomUsersAction['payload']) => {
+    socket.on('room_users_update', (user: UpdateRoomUsersAction['payload']) => {
       emit(roomActions.updateRoomUsers(user));
+    });
+    socket.on('room_user_update', (user: UpdateRoomUserAction['payload']) => {
+      emit(roomActions.updateRoomUser(user));
     });
     socket.on('room_status', (room: CheckRoomAction['payload']) => {
       emit(roomActions.updateRoom({ ...room, roomChecked: true }));

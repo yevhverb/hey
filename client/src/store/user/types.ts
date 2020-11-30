@@ -10,11 +10,14 @@ export interface UserState {
   userName: string;
   userEmoji: string;
   userStream: MediaStream | null;
+  userPermits: { audio: boolean };
 }
 
 export interface UpdateUserAction {
   type: typeof UserTypes.UPDATE_USER;
-  payload: { [key in keyof Partial<UserState>]: any };
+  payload: { isGlobal?: boolean } & {
+    [key in keyof Partial<UserState>]: any;
+  };
 }
 
 export interface CreateStreamAction {

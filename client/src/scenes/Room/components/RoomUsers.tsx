@@ -1,10 +1,10 @@
 import React from 'react';
-import { RoomUser as IRoomUser } from '../../../store/room';
+import { UserState } from '../../../store/user';
 import { RoomUser } from '../../RoomUser';
 
 type Props = {
   userStream: MediaStream | null;
-  roomUsers: IRoomUser[];
+  roomUsers: UserState[];
 };
 
 export const RoomUsers: React.FC<Props> = ({ userStream, roomUsers }) => {
