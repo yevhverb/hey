@@ -1,3 +1,5 @@
+import { UserState } from '../user';
+
 const prefix = 'ROOM/';
 
 export const RoomTypes = {
@@ -11,17 +13,10 @@ export const RoomTypes = {
   UPDATE_ROOM_USERS: `${prefix}UPDATE_ROOM_USERS`,
 };
 
-export interface RoomUser {
-  userId: string;
-  userName: string;
-  userEmoji: string;
-  userStream: MediaStream | null;
-}
-
 export interface RoomState {
   roomId: string;
   roomHost: string;
-  roomUsers: RoomUser[];
+  roomUsers: UserState[];
   roomStatus: boolean;
   roomChecked: boolean;
 }
@@ -43,12 +38,7 @@ export interface CheckRoomAction {
 
 export interface JoinRoomAction {
   type: typeof RoomTypes.CREATE_ROOM;
-  payload: {
-    roomId: string;
-    userId: string;
-    userName: string;
-    userEmoji: string;
-  };
+  payload: { roomId: string } & Partial<Omit<UserState, 'userStream'>>;
 }
 
 export interface LeaveRoomAction {
@@ -65,13 +55,13 @@ export interface UpdateRoomAction {
 
 export interface UpdateRoomUserAction {
   type: typeof RoomTypes.UPDATE_ROOM_USER;
-  payload: Partial<RoomUser>;
+  payload: Partial<UserState>;
 }
 
 export interface UpdateRoomUsersAction {
   type: typeof RoomTypes.UPDATE_ROOM_USERS;
   payload: {
     isNew: boolean;
-    roomUser: RoomUser;
+    roomUser: UserState;
   };
 }

@@ -18,7 +18,7 @@ export const Room = withRoomCheck(() => {
   const dispatch = useDispatch();
   const { roomId } = useParams<{ roomId: string }>();
   const { roomUsers } = useSelector(roomSelectors.room);
-  const { userId, userStream } = useSelector(userSelectors.user);
+  const { userId, userStream, userPermits } = useSelector(userSelectors.user);
   const [loadingRoom, setLoadingRoom] = React.useState(false);
   const [isCalledRoom, setIsCalledRoom] = React.useState(false);
   const [userEmoji] = React.useState(getRandomEmoji());
@@ -34,7 +34,7 @@ export const Room = withRoomCheck(() => {
 
   React.useEffect(() => {
     if (roomUsers.length) {
-      setLoadingRoom(false);
+      loadingRoom && setLoadingRoom(false);
       !userStream && dispatch(userActions.createStream());
     }
   }, [roomUsers]);
@@ -47,6 +47,13 @@ export const Room = withRoomCheck(() => {
   }, [userStream]);
 
   const copyRoomLink = () => toClipboard(window.location.href);
+
+  const toggleMuteStream = () => {
+    const audio = !userPermits.audio;
+    dispatch(
+      userActions.updateUser({ userPermits: { audio }, isGlobal: true })
+    );
+  };
 
   const leaveRoom = () => {
     dispatch(roomActions.updateRoom(null));
@@ -61,6 +68,7 @@ export const Room = withRoomCheck(() => {
         userId,
         userName,
         userEmoji,
+        userPermits: { audio: true },
       })
     );
   };
@@ -80,14 +88,18 @@ export const Room = withRoomCheck(() => {
   }
 
   if (!userStream) {
-    return <RoomMessage loader>Please allow to use micro...</RoomMessage>;
+    return <RoomMessage loader>Please allow to use microphone...</RoomMessage>;
   }
 
   return (
     <React.Fragment>
       <RoomTopBar roomId={roomId} copyRoomLink={copyRoomLink} />
       <RoomUsers userStream={userStream} roomUsers={roomUsers} />
-      <RoomBottomBar leaveRoom={leaveRoom} />
+      <RoomBottomBar
+        toggleMuteStream={toggleMuteStream}
+        userPermits={userPermits}
+        leaveRoom={leaveRoom}
+      />
     </React.Fragment>
   );
 });

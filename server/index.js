@@ -21,66 +21,15 @@ const rooms = {};
 const users = {};
 
 io.on('connection', (socket) => {
-  socket.on('room_create', ({ userId, roomId }) => {
-    users[userId] = roomId;
-    rooms[roomId] = { roomHost: userId, roomUsers: [] };
-  });
+  const handlers = require('./socketHandlers')({ io, socket, rooms, users });
 
-  socket.on('room_join', ({ roomId, userId, userName, userEmoji }) => {
-    if (rooms[roomId]) {
-      users[userId] = roomId;
-      rooms[roomId].roomUsers.unshift({ userId, userName, userEmoji });
-      io.to(roomId).emit('room_update_users', {
-        isNew: true,
-        roomUser: { userId, userName, userEmoji },
-      });
-      socket.emit('room_update', { roomId, ...rooms[roomId] });
-      socket.join(roomId);
-    } else {
-      socket.emit('room_update', null);
-    }
-  });
+  socket.on('room_create', handlers.roomCreate);
+  socket.on('room_check', handlers.roomCheck);
+  socket.on('room_join', handlers.roomJoin);
+  socket.on('room_leave', handlers.roomLeave);
+  socket.on('room_user_update', handlers.roomUserUpdate);
 
-  socket.on('room_check', ({ roomId }) => {
-    socket.emit('room_status', { roomStatus: Boolean(rooms[roomId]) });
+  peer.on('disconnect', ({ id: userId }) => {
+    handlers.roomLeave({ userId });
   });
-
-  socket.on('room_leave', ({ userId }) => {
-    const roomId = users[userId];
-    if (rooms[roomId]) {
-      if (rooms[roomId].roomHost !== userId) {
-        rooms[roomId].roomUsers = rooms[roomId].roomUsers.filter(
-          (u) => u.userId !== userId
-        );
-        io.to(roomId).emit('room_update_users', {
-          isNew: false,
-          roomUser: { userId },
-        });
-      } else {
-        io.to(roomId).emit('room_update', null);
-        delete rooms[roomId];
-      }
-      socket.leave(roomId);
-      delete users[userId];
-    }
-  });
-});
-
-peer.on('disconnect', ({ id: userId }) => {
-  const roomId = users[userId];
-  if (rooms[roomId]) {
-    if (rooms[roomId].roomHost !== userId) {
-      rooms[roomId].roomUsers = rooms[roomId].roomUsers.filter(
-        (u) => u.userId !== userId
-      );
-      io.to(roomId).emit('room_update_users', {
-        isNew: false,
-        roomUser: { userId },
-      });
-    } else {
-      io.to(roomId).emit('room_update', null);
-      delete rooms[roomId];
-    }
-    delete users[userId];
-  }
 });

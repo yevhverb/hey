@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { RoomUser as IRoomUser } from '../../store/room';
+import { UserState } from '../../store/user';
 import {
   UILogo,
   UIPaper,
@@ -10,14 +10,21 @@ import {
 import { withStreamAnalyzer } from './withStreamAnalyzer';
 import { RoomUserItem, RoomUserAction, RoomUserAnalyzer } from './components';
 
-interface Props extends IRoomUser {
+interface Props extends UserState {
   userStream: MediaStream | null;
   analyzerState?: { size: number };
   withMuted?: boolean;
 }
 
 export const RoomUser: React.FC<Props> = withStreamAnalyzer(
-  ({ userName, userEmoji, userStream, analyzerState, withMuted = true }) => {
+  ({
+    userName,
+    userEmoji,
+    userStream,
+    userPermits,
+    analyzerState,
+    withMuted = true,
+  }) => {
     const [audioState, setAudioState] = React.useState({ muted: !withMuted });
 
     const toggleMutedUser = () => {
@@ -53,7 +60,7 @@ export const RoomUser: React.FC<Props> = withStreamAnalyzer(
           <div className="absolute bottom-1.5 left-2 flex space-x-2">
             <RoomUserItem>
               <UIIconToggle
-                state={true}
+                state={userPermits.audio}
                 onClass="fas fa-microphone"
                 offClass="fas fa-microphone-slash text-red-600"
               />
